@@ -9,17 +9,17 @@ import time
 import string
 import re
 
-# Create the pattern for removing unwanted characters
+# unwanted characters
 acceptable_chars = string.ascii_letters + string.digits + string.punctuation + string.whitespace
 pattern = re.compile(f"[^{re.escape(acceptable_chars)}]")
 
 url = 'https://www.imdb.com/title/tt5726616/reviews/'
-driver = webdriver.Chrome() # Or use webdriver.Chrome(), depending on your preference and which driver you have installed
+driver = webdriver.Chrome()
 driver.get(url)
 
 wait = WebDriverWait(driver, 10)
 
-# Select the filter options
+
 sort_by_select = Select(wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'lister-sort-by'))))
 sort_by_select.select_by_value('submissionDate')
 
@@ -33,18 +33,16 @@ reviews = []
 ratings = []
 review_count = 0
 
-# Load and process the reviews
 while review_count < 1239:
     try:
-        # Click the "See More" button to expand reviews
+        # "See More"
         more_buttons = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'show-more__control')))
         for more_button in more_buttons:
             try:
                 more_button.click()
             except:
-                continue  # if we can't click, move on to the next button
-
-        # Load the reviews into BeautifulSoup
+                continue  
+        
         soup = BeautifulSoup(driver.page_source, 'html.parser')
 
         # Find the reviews and ratings
@@ -58,14 +56,13 @@ while review_count < 1239:
             if review_text_div and rating_span:  # only add reviews that have a rating
                 rating = rating_span.find('span').text
                 
-                # sanitize the review text
                 review = pattern.sub('', review_text_div.text)
                 
                 reviews.append(review)
                 ratings.append(int(rating))
                 review_count += 1
 
-        # If we still need more reviews, click the "Load More" button
+        # "Load More"
         if review_count < 1239:
             load_more_button = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'ipl-load-more__button')))
             load_more_button.click()
@@ -75,7 +72,6 @@ while review_count < 1239:
         print(f"Finished loading reviews. Reason: {str(e)}")
         break
 
-# Save the reviews and ratings to a DataFrame, and then to an Excel file
 df = pd.DataFrame({
     'Review': reviews,
     'Rating': ratings
