@@ -1,5 +1,5 @@
 # MD-Projeto
 
-Joana Santos -PG50856
+-Joana Santos -PG50856
 
-Marcos Ribeiro - PG50857
+-Marcos Ribeiro - PG50857
